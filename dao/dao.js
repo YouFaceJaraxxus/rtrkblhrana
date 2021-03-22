@@ -13,7 +13,7 @@ var pool  = mysql.createPool({
     database: JAWS_DB_DATABASE
 });
 
-exports.select = (queryString, callback) => {
+exports.sendQuery = (queryString, callback) => {
     let results = pool.query(queryString, (error, results, fields)=>{
         if (error) throw error;
         return callback(results)

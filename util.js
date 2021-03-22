@@ -1,22 +1,11 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const SECRET_KEY = process.env.SECRET;
+const SECRET_KEY = process.env.SECRET || 'XG7lFlmY1AH58VLH24djkUJBzXtmzXlP';
 
-generateToken = (user) => {
-    return jwt.sign(user.id.toHexString(), SECRET_KEY);
+exports.generateToken = (user) => {
+    let baseString = user.email+';'+user.password+';'+user.id;
+    console.log('baseString', baseString);
+    return jwt.sign((baseString.toString(16)), SECRET_KEY); //toString(16) == get Hex String
 }
 
-applySalt = (password, salt) => {
-    bcrypt.genSalt(SALT, (err,salt)=>{
-        if(err) return null;
-        else{
-            bcrypt.hash(password,salt, (err,saltedHash) => {
-                if(err) return null;
-                else{
-                    return saltedHash;
-                }
-            })
-        }
-    })
-}
 
