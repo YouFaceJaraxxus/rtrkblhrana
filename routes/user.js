@@ -63,20 +63,19 @@ loginWithCredentials = (req, res) =>{
             if(result&&result.length>0){
                 let user = result[0];
                 console.log('user', user.id)
-                let saltedPassword = password+user.id;
-                bcrypt.compare(saltedPassword, user.password, (err, isMatch)=>{
+                bcrypt.compare(password, user.password, (err, isMatch)=>{
                     if(err==null&&isMatch){
                         let newToken = util.generateToken(user);
                         console.log('newToken', newToken)
                         userDao.updateTokenById(user.id, newToken, result=>{
                             res.cookie('auth', newToken).status(200).json({message:'Login successful.', token:newToken});
                         });
-                    }else res.status(401).json({message:'Invalid credentials.'});
+                    }else res.status(401).json({message:'Invalid credentials 1.'});
                 })
             }
-            else res.status(401).json({message:'Invalid credentials.'});
+            else res.status(401).json({message:'Invalid credentials 2.'});
         })
-    }else res.status(401).json({message:'Invalid credentials.'}); 
+    }else res.status(401).json({message:'Invalid credentials 3.'}); 
     
 }
 
