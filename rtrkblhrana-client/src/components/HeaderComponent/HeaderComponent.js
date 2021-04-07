@@ -3,14 +3,22 @@ import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import GlobalContext from '../../GlobalContext';
 
-class MainComponent extends Component {
+class HeaderComponent extends Component {
     state = {  }
+
+    handleLanguageChange = (newLanguage) =>{
+        this.context.setLanguage(newLanguage);
+    }
+
+    handleThemeChange = (newTheme) =>{
+        this.context.setTheme(newTheme);
+    }
     render() { 
         return (
             <div>
                 <Navbar bg="light" expand="lg">
                     <Navbar.Brand>
-                        <LinkContainer to="/">
+                        <LinkContainer to="/order">
                             <Nav.Link>
                                 <img src="favicon.ico"></img>
                             </Nav.Link>
@@ -25,16 +33,13 @@ class MainComponent extends Component {
                         <LinkContainer to="/settings">
                             <Nav.Link>Podešavanje naloga</Nav.Link>
                         </LinkContainer>
-                        <LinkContainer to="/settings">
-                            <Nav.Link>TEMA : {this.context.theme}</Nav.Link>
-                        </LinkContainer>
-                        <NavDropdown title="Jezik" id="basic-nav-dropdown">
-                            <NavDropdown.Item>Latinica</NavDropdown.Item>
-                            <NavDropdown.Item>Ćirilica</NavDropdown.Item>
+                        <NavDropdown title={`Jezik : ${this.context.language}`} id="basic-nav-dropdown">
+                            <NavDropdown.Item onClick={()=>this.handleLanguageChange('Latinica')}>Latinica</NavDropdown.Item>
+                            <NavDropdown.Item onClick={()=>this.handleLanguageChange('Ћирилица')}>Ћирилица</NavDropdown.Item>
                         </NavDropdown>
-                        <NavDropdown title="Tema" id="basic-nav-dropdown">
-                            <NavDropdown.Item>Svijetla</NavDropdown.Item>
-                            <NavDropdown.Item>Tamna</NavDropdown.Item>
+                        <NavDropdown title={`Tema : ${this.context.theme}`} id="basic-nav-dropdown">
+                            <NavDropdown.Item onClick={()=>this.handleThemeChange('Svijetla')}>Svijetla</NavDropdown.Item>
+                            <NavDropdown.Item onClick={()=>this.handleThemeChange('Tamna')}>Tamna</NavDropdown.Item>
                         </NavDropdown>
                         </Nav>
                     </Navbar.Collapse>
@@ -45,5 +50,5 @@ class MainComponent extends Component {
     }
 }
  
-MainComponent.contextType = GlobalContext;
-export default MainComponent;
+HeaderComponent.contextType = GlobalContext;
+export default HeaderComponent;

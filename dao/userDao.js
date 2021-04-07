@@ -1,7 +1,7 @@
 const dao = require('./dao');
 
-const USER_SELECT_STRING = 'SELECT * FROM USER';
-const USER_UPDATE_STRING = 'UPDATE USER';
+const USER_SELECT_STRING = 'SELECT * FROM user';
+const USER_UPDATE_STRING = 'UPDATE user';
 
 exports.getAllUsers = (callback) => {
     dao.sendQuery(USER_SELECT_STRING, (response)=>{

@@ -26,10 +26,14 @@ class LoginMenu extends Component {
              email: this.state.email,
              password: this.state.password
          })
-         axios.post("/user/login", data)
+         axios.post("/user/login", data, {
+             headers:{
+                 'Content-type' : 'application/json'
+             }
+         })
          .then(response=>{
              if(response.status==200){
-                this.props.history.push('/data');
+                this.props.history.push('/order');
              }
          }).catch(err=>{
              console.log(err)
@@ -47,9 +51,9 @@ class LoginMenu extends Component {
         return ( 
             <div id="mainWrapper">
                 <form id="mainForm" method="POST" action={DATA_SERVER+"/user/login"} onSubmit={e => { e.preventDefault(); }}>
-                    <label className="loginLabel" for="email">E-mail:</label>
+                    <label className="loginLabel" htmlFor="email">E-mail:</label>
                     <input className="loginInput" placeholder="E-mail" type="text" name="email" value={this.state.email} onChange={this.handleEmailChange}></input> 
-                    <label className="loginLabel" for="password">Password:</label>
+                    <label className="loginLabel" htmlFor="password">Password:</label>
                     <input className="loginInput" placeholder="Password" type="password" name="password" value={this.state.password} onChange={this.handlePasswordChange}></input>
                     <button className="loginButton btn btn-primary btn-block" onClick={this.login}>Login</button>
                 </form>

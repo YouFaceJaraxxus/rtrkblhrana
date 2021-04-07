@@ -7,10 +7,12 @@ const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json()
 const SECRET_KEY = process.env.SECRET || 'XG7lFlmY1AH58VLH24djkUJBzXtmzXlP';
+const unauthorizedGuard = util.unauthorizedGuard;
+
+router.use((req, res, next) => unauthorizedGuard(req, res, next));
 
 router.get('/', (req, res)=>{
     userDao.getAllUsers((result)=>{
-        console.log('user', result);
         res.status(200).json(result);
     });
 })
@@ -18,7 +20,6 @@ router.get('/', (req, res)=>{
 router.get('/:id', jsonParser, (req, res)=>{
     let id = req.params['id'];
     userDao.getUserById(id, (result)=>{
-        console.log('user by id ' + id, result);
         res.status(200).json(result);
     });
 })
@@ -26,7 +27,6 @@ router.get('/:id', jsonParser, (req, res)=>{
 router.get('/token/:id', jsonParser, (req, res)=>{
     let id = req.params['id'];
     userDao.updateTokenById(id, 'bla',  (result)=>{
-        console.log('user by id ' + id, result);
         res.status(200).json(result);
     });
 })
@@ -34,7 +34,6 @@ router.get('/token/:id', jsonParser, (req, res)=>{
 router.post('/token/:id', jsonParser, (req, res)=>{
     let id = req.params['id'];
     userDao.updateTokenById(id, 'bla',  (result)=>{
-        console.log('user by id ' + id, result);
         res.status(200).json(result);
     });
 })
@@ -45,12 +44,6 @@ router.post('/token', jsonParser, (req, res) => {
         if(err) return cb(err);
         res.status(200).json(decode);
     })
-
-    
-    /*userDao.getUserByToken(token, (result)=>{
-        console.log('user by token ' + token, result);
-        res.send(JSON.stringify(result));
-    });*/
 })
 
 
@@ -59,14 +52,12 @@ loginWithCredentials = (req, res) =>{
     let password = req.body.password;
     if(email!=null&&password){
         userDao.getUserByEmail(email, (result) => {
-            console.log('login by credentials', result)
+            console.log('login by credentials')
             if(result&&result.length>0){
                 let user = result[0];
-                console.log('user', user.id)
                 bcrypt.compare(password, user.password, (err, isMatch)=>{
                     if(err==null&&isMatch){
                         let newToken = util.generateToken(user);
-                        console.log('newToken', newToken)
                         userDao.updateTokenById(user.id, newToken, result=>{
                             res.cookie('auth', newToken).status(200).json({message:'Login successful.', token:newToken});
                         });
@@ -81,13 +72,11 @@ loginWithCredentials = (req, res) =>{
 
 router.post('/login', (req,res)=>{
     let cookies = req.cookies;
-    console.log(cookies);
     if(cookies&&cookies.auth){
         let token = cookies.auth;
-        console.log('login by token', token);
+        console.log('login by token');
         userDao.getUserByToken(token, (result)=>{
-            console.log('login by token good', result);
-            console.log(result);
+            console.log('login by token good');
             if(!result||result.length==0){
                 loginWithCredentials(req, res)
             }
@@ -108,7 +97,6 @@ changePassword = (res, newPassword, user) => {
                 if(err==null&&hashedNewPassword!=null)
                 {
                     userDao.updatePasswordById(user.id, hashedNewPassword, (result)=>{
-                        console.log('result of updating password', result);
                         userDao.updateTokenById(user.id, null, result=>{
                             res.status(200).json({message:'Password change successful.'});
                         })
@@ -126,30 +114,12 @@ router.post('/settings/password', (req,res)=>{
     let newPassword = req.body.newPassword;
     if(email!=null&&newPassword!=null){
         userDao.getUserByEmail(email, (result) => {
-            console.log('settings by credentials 1', result)
             if(result&&result.length>0){
                 let user = result[0];
-                console.log('user', user.id)
                 if(user.isActivated==null||user.isActivated==0){
                     changePassword(res, newPassword, user);
                 }else if(oldPassword!=null){
-                    bcrypt.hash(oldPassword,user.id, (err,hash) => {
-                        console.log('hash', hash);
-                        console.log(user.password);
-                    })
-                    bcrypt.genSalt(user.id, (err, salt) => {
-                        if(err==null&&salt!=null){
-                            bcrypt.hash(oldPassword, salt, (err,hashedOldPassword)=>{
-                                if(err==null&&hashedOldPassword!=null)
-                                {
-                                    console.log('hashedOldPassword', hashedOldPassword)
-                                }
-                            })
-                        }
-                    })
                     bcrypt.compare(oldPassword, user.password, (err, isMatch)=>{
-                        console.log(err);
-                        console.log(isMatch);
                         if(err==null&&isMatch){
                             changePassword(res, newPassword, user);
                         }else res.status(401).json({message:'Invalid credentials.'});

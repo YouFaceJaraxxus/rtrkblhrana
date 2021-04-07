@@ -1,0 +1,18 @@
+.menu-default, .menu-special{
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.menu-wrapper{
+    display: block;
+}
+
+.menu-button{
+    margin: auto;
+    width: 80% !important;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
