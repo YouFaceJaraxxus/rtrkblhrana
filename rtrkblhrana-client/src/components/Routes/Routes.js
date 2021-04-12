@@ -16,11 +16,12 @@ class Routes extends Component {
             <BrowserRouter>
                 <HeaderComponent></HeaderComponent>
                 <Switch>
-                    <Route exact path="/" exact component={WelcomeComponent}/>
-                    <Route exact path="/login" exact component={LoginMenu}/>
-                    <Route exact path="/order" exact component={FoodMenu}/>
-                    <Route exact path="/settings" exact component={SettingsMenu}/>
-                    <Route exact path="/admin" exact component={AdminMenu}/>
+                    <Route exact path="/" component={WelcomeComponent}/>
+                    <Route exact path="/login" component={LoginMenu}/>
+                    <Route exact path="/order" component={FoodMenu}/>
+                    <Route exact path="/settings" component={SettingsMenu}/>
+                    <Route exact path="/admin" component={AdminMenu}/>
+                    <Route path="*" component={WelcomeComponent}/>
                 </Switch>
             </BrowserRouter>
          );
