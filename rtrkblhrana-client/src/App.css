@@ -1,7 +1,9 @@
 .main-wrapper-light{
-  background-color: beige;
+  background-color: #fefefe;
+  height: 100% !important;
 }
 
 .main-wrapper-dark{
-  background-color: grey;
+  background-color: #525050;
+  height: 100% !important;
 }

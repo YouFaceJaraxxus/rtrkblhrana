@@ -1,35 +1,68 @@
 .food-card {
-    background-color: beige;
     border-radius: 10px;
-    width: 95%;
-    width: 40%;
-    margin: 2%;
-    padding: 1% 1.5%;
+    width: 15%;
+    margin: 0.5%;
+    padding: 1%;
+    font-size: 0.8em !important;
 }
+
 
 .food-card-special {
-    background-color: ivory;
-    margin: 2%;
-    padding: 1% 1.5%;
+    margin: 0.5%;
+    padding: 0.5% 1%;
     width: 40%;
+    border-radius: 10px;
+    font-size: 0.8em !important;
 }
 
-.food-card-image-wrapper {
-    width: 50%;
-    height: 50%;
+.food-card-title{
+    display: inline;
+    margin-left: 1%;
+    font-size: 0.9em !important;
+}
+
+.food-card-main-checkbox:hover, .food-card-title:hover{
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+.food-card-image-extra-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
     margin: 1% 0;
 }
 
-.food-card-image{
+.food-card-image-wrapper{
     border-radius: 10px;
+    width: 35%;
+    height: 35%;
 }
 
-.food-card-selected {
-    background-color: rgb(184, 243, 157);
+.food-image{
+    border-radius: 10px;
+    width: 100%;
 }
 
-.food-card:hover, .food-card-special:hover {
-    opacity: 0.8;
+.comments{
+    background-color: white !important;
+    border-radius: 10px;
+    padding: 1%;
+}
+
+.ratings{
+    margin-right: 5%;
+    margin-top: 2%;
+}
+
+.chevron-wrapper{
+    text-align: center;
+}
+
+.chevron-wrapper:hover{
+    opacity: 0.9;
     cursor: pointer;
 }
 
@@ -38,19 +71,63 @@
 }
 
 .sidedish-wrapper-special{
-    margin-top: 5%;
+    margin-top: 2%;
 }
 
 .sidedish-label{
     margin-left: 1%;
 }
 
-.food-card-text-light{
-    color: rgb(58, 54, 54);
+.food-card-light-selected {
+    background-color: rgb(212, 252, 104) !important;
 }
 
-@media only screen and (max-width : 425px){
+.food-card-dark-selected {
+    background-color: rgb(58, 77, 24) !important;
+}
+
+.food-card-light{
+    background-color: #e6e8f0;
+}
+
+.food-card-dark{
+    background-color: rgb(61, 59, 59);
+}
+
+.food-card-text-light{
+    color: rgb(58, 54, 54) !important;
+}
+
+.food-card-text-dark{
+    color: white !important;
+}
+
+.food-card-special-light{
+    background-color: #dee3f0;
+}
+
+.food-card-special-dark{
+    background-color: rgb(29, 28, 28);
+}
+
+
+@media only screen and (max-width : 600px){
     .food-card, .food-card-special{
         width: 90%;
+        padding: 2%;
+    }
+
+    .food-card-image-wrapper{
+        width: 100%;
+    }
+
+    .ratings{
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .food-card-image-extra-wrapper{
+        justify-content: center;
+        align-items: center;
     }
 }

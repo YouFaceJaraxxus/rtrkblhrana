@@ -4,6 +4,8 @@ import moment from 'moment';
 import FoodItem from '../FoodItem/FoodItem';
 import './FoodMenu.css';
 import ClipLoader from "react-spinners/ClipLoader";
+import GlobalContext from "../../GlobalContext";
+import {getLocalDay} from '../../util.js'
 
 class FoodMenu extends Component {
     state = { 
@@ -98,13 +100,49 @@ class FoodMenu extends Component {
         )
     }
 
-    handleSelectionChange = (mealId, newSidedishes) => {
-        console.log('handle called ' + mealId, newSidedishes)
-        this.setState({
-            selectedMealId : mealId,
-            selectedSideDishes : newSidedishes
-        })
+    incrementDate = () => {
+        let day = moment(this.state.currentDate).format('dddd');
+        if(day=='Friday') {
+            this.setState({
+                currentDate : moment(this.state.currentDate).add(3, 'days').format('YYYY-MM-DD')
+            })
+        }else{
+            this.setState({
+                currentDate : moment(this.state.currentDate).add(1, 'days').format('YYYY-MM-DD')
+            })
+        }
+        
     }
+
+    decrementDate = () => {
+        let day = moment(this.state.currentDate).format('dddd');
+        if(day=='Monday') {
+            this.setState({
+                currentDate : moment(this.state.currentDate).add(-3, 'days').format('YYYY-MM-DD')
+            })
+        }else{
+            this.setState({
+                currentDate : moment(this.state.currentDate).add(-1, 'days').format('YYYY-MM-DD')
+            })
+        }
+    }
+
+    handleSelectionChange = (mealId, newSidedishes, deselect = false) => {
+        console.log('handle called ' + mealId, newSidedishes)
+        if(this.state.selectedMealId==mealId&&deselect){
+            this.setState({
+                selectedMealId : null,
+                selectedSideDishes : []
+            })
+        }
+        else{
+            this.setState({
+                selectedMealId : mealId,
+                selectedSideDishes : newSidedishes
+            })
+        }
+    }
+    
 
     noMeals = () => {
         return (this.state.defaultMeals==null||this.state.defaultMeals.length==0)
@@ -143,25 +181,43 @@ class FoodMenu extends Component {
 
     render() { 
         return ( 
-            this.noMeals() ? 
-            <div className="menu-wrapper no-items">
+            this.state.loading ? 
+            <div className="custom-spinner-wrapper">
                 <ClipLoader color="blue" loading={this.state.loading} size={300} />
             </div>
 
             :
 
-            <div className="menu-wrapper">
-                <div className="menu-special">
+            this.noMeals()?
+
+            <div className={`global-background-${this.context.theme} global-text-${this.context.theme} no-meals`}>
+                <h1>
+                    Meni nije dostupan.
+                </h1>
+            </div>
+
+            :
+
+            <div className={`menu-wrapper global-background-${this.context.theme}`}>
+                <div className = "menu-navigation-wrapper">
+                    <i className={`fa fa-chevron-left food-card-text-${this.context.theme} navigation-chevron`} onClick={this.decrementDate}></i>
+                    <div className={`food-card-text-${this.context.theme}`}>
+                        {getLocalDay(moment(this.state.currentDate).format('dddd'))}, {moment(this.state.currentDate).format('DD-MM-YYYY')}
+                    </div>
+                    <i className={`fa fa-chevron-right food-card-text-${this.context.theme} navigation-chevron`} onClick={this.incrementDate}></i>
+                </div>
+                <div className={`menu-special global-background-${this.context.theme}`}>
                     {this.mapMeals(this.state.specialMeals, true)}
                 </div>
                 <hr/>
-                <div className="menu-default">
+                <div className={`menu-default global-background-${this.context.theme}`}>
                     {this.mapMeals(this.state.defaultMeals, false)}
                 </div>
-                <button className="btn btn-primary btn-block menu-button" onClick={this.alertSelection}>Selection</button>
+                <button className={`btn btn-block menu-button menu-button-${this.context.theme}`} onClick={this.alertSelection}>Selection</button>
             </div> 
          );
     }
 }
- 
+
+FoodMenu.contextType = GlobalContext;
 export default FoodMenu;

@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import GlobalContext from './GlobalContext'
 import Routes from './components/Routes/Routes';
+import './App.css';
+import {getLocalStorageItem} from './util.js'
+
 class App extends Component {
+
     state = { 
-        theme : 'Svijetla',
-        language : 'Latinica',
+        theme : getLocalStorageItem('theme', 'light'),
+        language : getLocalStorageItem('language', 'latin'),
         isLogged : false,
         isAdmin : false,
 
@@ -12,12 +16,14 @@ class App extends Component {
             this.setState({
                 theme : theme
             })
+            global.window.localStorage.setItem('theme', theme);
         },
 
         setLanguage : (language) => {
             this.setState({
                 language : language
             })
+            global.window.localStorage.setItem('language', language);
         },
 
         setIsLogged : (isLogged) => {
@@ -32,6 +38,8 @@ class App extends Component {
             })
         }
      }
+
+
     render() { 
         return ( 
             <GlobalContext.Provider value={this.state}>

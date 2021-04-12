@@ -1,4 +1,4 @@
-.menu-default, .menu-special{
+.menu-default{
     display: flex;
     justify-content: center;
     align-items: stretch;
@@ -6,13 +6,73 @@
     flex-wrap: wrap;
 }
 
-.menu-wrapper{
-    display: block;
+.menu-special{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 1%;
+}
+
+.menu-navigation-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 50%;
+    margin: auto;
+    margin-top: 1%;
+}
+
+.navigation-chevron:hover{
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.food-card-text-light{
+    color: rgb(58, 54, 54) !important;
+}
+
+.food-card-text-dark{
+    color: white !important;
 }
 
 .menu-button{
     margin: auto;
-    width: 80% !important;
+    width: 95% !important;
     margin-top: 2%;
-    margin-bottom: 2%;
+}
+
+.menu-button:hover{
+    opacity: 0.9;
+}
+
+.menu-button-light{
+    background-color: rgb(203, 206, 216) !important;
+    color: rgb(58, 54, 54) !important;
+}
+
+.menu-button-dark{
+    background-color: rgb(36, 35, 35) !important;
+    color: white !important;
+}
+
+.menu-wrapper{
+    padding-bottom: 1%;
+}
+
+
+.custom-spinner-wrapper, .no-meals{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 10%;
+}
+
+@media only screen and (max-width : 600px){
+    .menu-button{
+        width: 90% !important;
+    }
 }
