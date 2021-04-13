@@ -33,8 +33,6 @@ class FoodMenu extends Component {
                 'Content-type' : 'application/json'
             }
         }).then(response=>{
-            //console.log('response', response);
-            //console.log('response data', response.data);
             this.setState({
                 defaultMeals : response.data
             })
@@ -79,11 +77,6 @@ class FoodMenu extends Component {
             meals&&meals.length>0 ?
             meals.map((item, index) => {
                 let sidedishes = sidedishList? sidedishList.filter(sidedish => sidedish.mealId == item.id) : null;
-                if(special){
-                    //console.log('sidedishList', sidedishList);
-                    //console.log('sidedishList', sidedishes);
-                    //if(item.id == selectedMealId) console.log('selected', item.id)
-                }
                 return(
                     <FoodItem 
                         key={item.id}
@@ -128,7 +121,6 @@ class FoodMenu extends Component {
     }
 
     handleSelectionChange = (mealId, newSidedishes, deselect = false) => {
-        console.log('handle called ' + mealId, newSidedishes)
         if(this.state.selectedMealId==mealId&&deselect){
             this.setState({
                 selectedMealId : null,

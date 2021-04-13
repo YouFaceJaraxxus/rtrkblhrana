@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import GlobalContext from '../../GlobalContext';
+import { withRouter } from 'react-router';
 
 class HeaderComponent extends Component {
     state = {  }
@@ -13,7 +14,14 @@ class HeaderComponent extends Component {
     handleThemeChange = (newTheme) =>{
         this.context.setTheme(newTheme);
     }
+
+    logout = ()=> {
+        document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        this.props.history.push('/login');
+    }
+
     render() { 
+        const { history } = this.props;
         return (
             <div>
                 <Navbar bg={this.context.theme} variant={this.context.theme} expand="lg">
@@ -27,22 +35,25 @@ class HeaderComponent extends Component {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="mr-auto">
-                        <LinkContainer to="/order">
-                            <Nav.Link>Naručivanje hrane</Nav.Link>
-                        </LinkContainer>
-                        <LinkContainer to="/settings">
-                            <Nav.Link>Podešavanje naloga</Nav.Link>
-                        </LinkContainer>
-                        <NavDropdown variant={this.context.theme} title={`Jezik : ${this.context.language}`} id="basic-nav-dropdown">
-                            <NavDropdown.Item onClick={()=>this.handleLanguageChange('latin')}>Latinica</NavDropdown.Item>
-                            <NavDropdown.Item onClick={()=>this.handleLanguageChange('cyrillic')}>Ћирилица</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown variant={this.context.theme} title={`Tema : ${this.context.theme}`} id="basic-nav-dropdown">
-                            <NavDropdown.Item onClick={()=>this.handleThemeChange('light')}>Svijetla</NavDropdown.Item>
-                            <NavDropdown.Item onClick={()=>this.handleThemeChange('dark')}>Tamna</NavDropdown.Item>
-                        </NavDropdown>
+                            <LinkContainer to="/order">
+                                <Nav.Link>Naručivanje hrane</Nav.Link>
+                            </LinkContainer>
+                            <LinkContainer to="/settings">
+                                <Nav.Link>Podešavanje naloga</Nav.Link>
+                            </LinkContainer>
+                            <NavDropdown variant={this.context.theme} title={`Jezik : ${this.context.language}`} id="basic-nav-dropdown">
+                                <NavDropdown.Item onClick={()=>this.handleLanguageChange('latin')}>Latinica</NavDropdown.Item>
+                                <NavDropdown.Item onClick={()=>this.handleLanguageChange('cyrillic')}>Ћирилица</NavDropdown.Item>
+                            </NavDropdown>
+                            <NavDropdown variant={this.context.theme} title={`Tema : ${this.context.theme}`} id="basic-nav-dropdown">
+                                <NavDropdown.Item onClick={()=>this.handleThemeChange('light')}>Svijetla</NavDropdown.Item>
+                                <NavDropdown.Item onClick={()=>this.handleThemeChange('dark')}>Tamna</NavDropdown.Item>
+                            </NavDropdown>
                         </Nav>
                     </Navbar.Collapse>
+                    <Nav variant={this.context.theme}>
+                        <Nav.Link variant={this.context.theme} onClick={this.logout}>Odjavi se</Nav.Link>
+                    </Nav>
                 </Navbar>
             </div>
             
@@ -51,4 +62,4 @@ class HeaderComponent extends Component {
 }
  
 HeaderComponent.contextType = GlobalContext;
-export default HeaderComponent;
+export default withRouter(HeaderComponent);

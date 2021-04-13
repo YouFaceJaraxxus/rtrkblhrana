@@ -16,43 +16,27 @@ class FoodItem extends Component {
 
     toggleSelectedMeal = () => {
         this.props.selectionChangeHandler(this.props.id, this.state.selectedSideDishes, true);
-        if(this.props.isSpecial){
-            console.log('special sidedishes ' + this.props.id, this.props.sideDishes)
-        }
     }
 
     toggleSelectedSideDish = (sidedishId) => {
         if(this.props.isSelected){
-            console.log('selected', sidedishId + ' - ' + this.props.id);
-            setTimeout(()=>console.log('state from ' + this.props.id, this.state.selectedSideDishes), 2000)
             this.props.selectionChangeHandler(this.props.id, this.state.selectedSideDishes, false)
             if(this.state.selectedSideDishes.includes(sidedishId)){
-                console.log('deselecting', sidedishId);
                 let removedDish = this.state.selectedSideDishes.filter(item => item!=sidedishId);
                 this.setState({
                     selectedSideDishes : removedDish
                 })
             }
             else {
-                console.log('selecting', sidedishId);
                 this.setState({
                     selectedSideDishes : [...this.state.selectedSideDishes, sidedishId]
                 }, () => {
-                    console.log('switching to ' + this.props.id, this.state.selectedSideDishes)
                     this.props.selectionChangeHandler(this.props.id, this.state.selectedSideDishes, false)
                 })
             }
         }
         
     }
-
-    componentDidUpdate(prevProps, newProps){
-        if (prevProps.isSelected!=newProps.isSelected){
-            //console.log('prevProps', prevProps)
-            //console.log('newProps', newProps)
-        }
-    }
-
 
     mapSideDishes = () => {
         return (

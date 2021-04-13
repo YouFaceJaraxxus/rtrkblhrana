@@ -6,6 +6,7 @@ import SettingsMenu from '../SettingsMenu/SettingsMenu';
 import AdminMenu from '../AdminMenu/AdminMenu';
 import HeaderComponent from '../HeaderComponent/HeaderComponent';
 import WelcomeComponent from '../WelcomeComponent/WelcomeComponent';
+import { withRouter } from 'react-router';
 
 class Routes extends Component {
     state = { 
