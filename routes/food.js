@@ -1,8 +1,12 @@
 const exp = require('express');
+const util = require('../util');
 const router = exp.Router();
 const foodDao = require('../dao/foodDao');
 const specialtyDao = require('../dao/specialtyDao');
 const sidedishDao = require('../dao/sidedishDao');
+const unauthorizedGuard = util.unauthorizedGuard;
+
+router.use((req, res, next) => unauthorizedGuard(req, res, next));
 
 router.get('/', (req, res) => {
     res.send("Welcome to login");

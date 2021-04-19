@@ -23,9 +23,9 @@ exports.unauthorizedGuard = (req, res, next) => {
                     console.log('verify by token good');
                     let currentUser = result[0];
                     req.body.currentUser = currentUser;
+                    next();
                 }
             });
         }else res.status(401).json({ message: "Unauthorized" });
-        
     }else next();
 }

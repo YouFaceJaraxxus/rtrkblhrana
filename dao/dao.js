@@ -21,3 +21,7 @@ exports.sendQuery = (queryString, callback) => {
     return results;
 }
 
+exports.pool = pool;
+
+
+

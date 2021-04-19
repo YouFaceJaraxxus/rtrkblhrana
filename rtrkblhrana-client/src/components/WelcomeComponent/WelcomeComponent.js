@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import * as util from '../../util';
 import axios from 'axios';
 import GlobalContext from '../../GlobalContext';
+import './WelcomeComponent.css';
 
 class WelcomeComponent extends Component {
     state = {  }
@@ -34,7 +35,7 @@ class WelcomeComponent extends Component {
 
     render() { 
         return ( 
-            <div>
+            <div className="center-image">
                 <img src="./rt-rk_logo_large.png"></img>
             </div>
         );

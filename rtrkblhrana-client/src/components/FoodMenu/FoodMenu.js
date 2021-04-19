@@ -33,9 +33,16 @@ class FoodMenu extends Component {
                 'Content-type' : 'application/json'
             }
         }).then(response=>{
-            this.setState({
-                defaultMeals : response.data
-            })
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                this.setState({
+                    defaultMeals : response.data
+                })
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
         })
 
         axios.post('/food/special/date', body, {
@@ -43,9 +50,16 @@ class FoodMenu extends Component {
                 'Content-type' : 'application/json'
             }
         }).then(response=>{
-            this.setState({
-                specialMeals : response.data
-            })
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                this.setState({
+                    specialMeals : response.data
+                })
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
         })
 
         axios.get('/food/sidedish/default', {
@@ -53,9 +67,16 @@ class FoodMenu extends Component {
                 'Content-type' : 'application/json'
             }
         }).then(response=>{
-            this.setState({
-                defaultSidedishes : response.data
-            })
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                this.setState({
+                    defaultSidedishes : response.data
+                })
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
         })
 
         axios.post('/food/sidedish/special/date', body, {
@@ -63,10 +84,17 @@ class FoodMenu extends Component {
                 'Content-type' : 'application/json'
             }
         }).then(response=>{
-            this.setState({
-                specialSidedishes : response.data,
-                loading : false
-            })
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                this.setState({
+                    specialSidedishes : response.data,
+                    loading : false
+                })
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
         })
     }
 
