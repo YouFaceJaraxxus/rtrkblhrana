@@ -61,12 +61,12 @@ loginWithCredentials = (req, res) =>{
                         userDao.updateTokenById(user.id, newToken, result=>{
                             res.cookie('auth', newToken).status(200).json({message:'Login successful.', token:newToken});
                         });
-                    }else res.status(401).json({message:'Invalid credentials 1.'});
+                    }else res.status(401).json({message:'Invalid credentials.'});
                 })
             }
-            else res.status(401).json({message:'Invalid credentials 2.'});
+            else res.status(401).json({message:'Invalid credentials.'});
         })
-    }else res.status(401).json({message:'Invalid credentials 3.'}); 
+    }else res.status(401).json({message:'Invalid credentials.'}); 
     
 }
 

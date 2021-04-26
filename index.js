@@ -11,11 +11,15 @@ app.use(express.static('rtrkblhrana-client/build'))
 const foodRoute = require('./routes/food');
 const userRoute = require('./routes/user');
 const orderRoute = require('./routes/order');
+const locationRoute = require('./routes/location');
+const timeRoute = require('./routes/time');
 const defaultRoute = require('./routes/default');
 
 app.use("/food", foodRoute);
 app.use("/user", userRoute);
 app.use("/order", orderRoute);
+app.use("/location", locationRoute);
+app.use("/time", timeRoute);
 
 
 

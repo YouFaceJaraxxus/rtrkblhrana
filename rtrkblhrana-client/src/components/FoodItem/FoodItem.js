@@ -70,14 +70,13 @@ class FoodItem extends Component {
     }
 
     render() { 
-        if(this.props.isSelected) console.log('food-card-selected')
         return ( 
             this.props.isSpecial?
             <div className={`food-card-special-${this.context.theme} food-card-special${this.props.isSelected? ` food-card-${this.context.theme}-selected` : ''} `}>
                 <div>
                     <h6 className={`food-card-text-${this.context.theme}`}>
-                        <input className="food-card-main-checkbox" id={this.props.id} checked={this.props.isSelected} type="checkbox" onChange={this.toggleSelectedMeal}></input>
-                        <label className = {`food-card-title food-card-text-${this.context.theme}`} htmlFor={this.props.id}>{this.props.mealName}</label>
+                        <input className="food-card-main-checkbox" id={`meal-${this.props.id}`} checked={this.props.isSelected} type="checkbox" onChange={this.toggleSelectedMeal}></input>
+                        <label className = {`food-card-title food-card-text-${this.context.theme}`} htmlFor={`meal-${this.props.id}`}>{this.props.mealName}</label>
                     </h6>
                     <div className="food-card-image-extra-wrapper">
                         <div className="food-card-image-wrapper">
@@ -133,8 +132,8 @@ class FoodItem extends Component {
 
             <div className={`food-card${this.props.isSelected? ` food-card-${this.context.theme}-selected` : ''} food-card-${this.context.theme}`}>
                 <h6 className={`food-card-text-${this.context.theme}`}>
-                    <input className="food-card-main-checkbox" id={this.props.id} type="checkbox" onChange={this.toggleSelectedMeal}></input>
-                    <label className = {`food-card-title food-card-text-${this.context.theme}`} htmlFor={this.props.id}>{this.props.mealName}</label>
+                    <input className="food-card-main-checkbox" id={`meal-${this.props.id}`} checked={this.props.isSelected} type="checkbox" onChange={this.toggleSelectedMeal}></input>
+                    <label className = {`food-card-title food-card-text-${this.context.theme}`} htmlFor={`meal-${this.props.id}`}>{this.props.mealName}</label>
                 </h6>
                 {this.mapSideDishes()}
             </div>

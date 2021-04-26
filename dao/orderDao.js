@@ -13,139 +13,139 @@ exports.getAllOrders = (callback) => {
 }
 
 exports.getAllOrdersByDate = (date, callback) => {
-    getMealByParameter(`date = '${date}'`, callback);
+    getOrderByParameter(`date = '${date}'`, callback);
 }
 
 exports.getAllOrdersByUser = (userId, callback) => {
-    getMealByParameter(`userId = '${userId}'`, callback);
+    getOrderByParameter(`userId = '${userId}'`, callback);
 }
 
 exports.getAllOrdersByUserAndDate = (userId, date, callback) => {
-    getMealByParameter(`userId = '${userId}' and date = '${date}'`, callback);
+    getOrderByParameter(`userId = '${userId}' and date = '${date}'`, callback);
 }
 
-const orderSidedishesRecursively = (connection, orderId, sideDishes, currentPosition, length, callback) => {
-    let currentSidedish = sideDishes[currentPosition];
-    connection.query(`INSERT INTO order_meal_sidedish (orderId, mealId, sidedishId) VALUES ('${orderId}', '${currentSidedish.mealId}', '${currentSidedish.sidedishId}')`, function (error, results, fields) {
-        console.log(results);
-        // When done with the connection, release it.
-        if(currentPosition==length-1){
-            connection.release();
-                    
-            // Handle error after the release.
-            return callback(orderId);
-        }
-
-        else return recursiveCall(connection, orderId, sideDishes, currentPosition+1, length, callback);
-        
-
-        // Don't use the connection here, it has been returned to the pool.
-        
-    });
+const orderSidedishesRecursively = (connection, mealId, orderId, sideDishes, currentPosition, length, callback) => {
+    if(length>0){
+        let currentSidedish = sideDishes[currentPosition];
+        connection.query(`INSERT INTO order_meal_sidedish (orderId, mealId, sidedishId) VALUES ('${orderId}', '${mealId}', '${currentSidedish}')`, function (error, results, fields) {
+            if(error){
+                connection.release();
+                return callback("Error when inserting order sidedish.");
+            }
+            if(currentPosition==length-1){
+                connection.release();
+                return callback(orderId);
+            }
+            else return recursiveCall(connection, mealId, orderId, sideDishes, currentPosition+1, length, callback);
+        });
+    }
+    else{
+        connection.release();
+        return callback(orderId);
+    }
+    
 }
 
-const recursiveCall = (connection, orderId, sideDishes, currentPosition, length, callback) => {
-    return orderSidedishesRecursively(connection, orderId, sideDishes, currentPosition, length, callback);
+const recursiveCall = (connection, mealId, orderId, sideDishes, currentPosition, length, callback) => {
+    return orderSidedishesRecursively(connection, mealId, orderId, sideDishes, currentPosition, length, callback);
 }
 
 //returns the id of the created/updated meal, also clean up the sidedishes
-exports.orderMeal = (userId, date, mealId, locationId, time, sideDishes, callback) => {
-    dao.pool.getConnection(function(err, connection) {
-        if (err) throw err; // not connected!
-        
-        // Use the connection
-        connection.query(`INSERT INTO meal_order (userId, date, mealId, locationId, time) VALUES ('${userId}', '${date}', '${mealId}', '${locationId}', '${time}') ON DUPLICATE KEY UPDATE mealId = '${mealId}', locationId= '${locationId}', time = '${time}'`, function (error, results, fields) {
-            console.log('order results', results);
+exports.orderMeal = (userId, date, mealId, locationId, timeId, sideDishes, callback) => {
+    dao.pool.getConnection(function(error, connection) {
+        if (error){
+            connection.release();
+            return callback("Error when establishing connection"); 
+        }
+        connection.query(`INSERT INTO meal_order (userId, date, mealId, locationId, timeId) VALUES ('${userId}', '${date}', '${mealId}', '${locationId}', '${timeId}') ON DUPLICATE KEY UPDATE mealId = '${mealId}', locationId= '${locationId}', timeId = '${timeId}'`, function (error, results, fields) {
+            if(error){
+                connection.release();
+                return callback("Error when establishing connection.");
+            }
             let orderId = results.insertId;
 
             if(orderId==0){
                 connection.query(`SELECT * FROM meal_order WHERE userId = '${userId}' AND date = '${date}'`, function (error, results, fields) {
+                    if(error){
+                        connection.release();
+                        return callback("Error when selecting meal order.");
+                    }
                     let order = results[0];
                     let orderId = order.id;
 
                     connection.query(`DELETE FROM order_meal_sidedish WHERE orderId = '${orderId}'`, function (error, results, fields) {
-                        // When done with the connection, release it.
-                        return orderSidedishesRecursively(connection, orderId, sideDishes, 0, sideDishes.length, callback);
+                        if(error){
+                            connection.release();
+                            return callback ("Error when deleting order sidedishes 1.")
+                        }
+                        return orderSidedishesRecursively(connection, mealId, orderId, sideDishes, 0, sideDishes.length, callback);
                     })
                 })
             }
             else{
                 connection.query(`DELETE FROM order_meal_sidedish WHERE orderId = '${orderId}'`, function (error, results, fields) {
-                    // When done with the connection, release it.
-                    return orderSidedishesRecursively(connection, orderId, sideDishes, 0, sideDishes.length, callback);
+                    if(error){
+                        connection.release();
+                        return callback ("Error when deleting order sidedishes 2.")
+                    }
+                    return orderSidedishesRecursively(connection, mealId, orderId, sideDishes, 0, sideDishes.length, callback);
                 })
             }
-
-            
         });
     });
 }
 
 exports.deleteOrder = (userId, date, callback) => {
-    dao.pool.getConnection(function(err, connection) {
-        if (err) throw err; // not connected!
-        
-        // Use the connection
+    dao.pool.getConnection(function(error, connection) {
+        if (error) return callback("Error when establishing connection") 
         connection.query(`SELECT * FROM meal_order WHERE userId = '${userId}' AND date = '${date}'`, function (error, results, fields) {
-            console.log(results);
-            if(results&&results.length>0){
+            if(error){
+                connection.release();
+                return callback ("Error when selecting meal order.")
+            }
+            if(results&&results[0]){
                 let mealOrder = results[0];
-                connection.query(`DELETE FROM order_meal_sidedish WHERE orderId = '${mealOrder.id}'`, function (error, results, fields) {
-                    // When done with the connection, release it.
-                    connection.release();
-                        
-                    // Handle error after the release.
-                    if (error) throw error;
-                    return callback(results);
-    
-                    // Don't use the connection here, it has been returned to the pool.
+                return connection.query(`DELETE FROM order_meal_sidedish WHERE orderId = ${mealOrder.id}`, function (error, results, fields) {
+                    if(error){
+                        connection.release();
+                        return callback ("Error when deleting meal sidedish.")
+                    }
+                    return connection.query(`DELETE FROM meal_order WHERE userId = '${userId}' AND date = '${date}'`, function (error, results, fields) {
+                        connection.release();
+                        if(error){
+                            console.log(error)
+                            return callback ("Error when deleting order.")
+                        }
+                        return callback(mealOrder.id);
+                    })
                 })
             }else{
-                console.log('no such meal_order');
-                // When done with the connection, release it.
                 connection.release();
-                        
-                // Handle error after the release.
-                if (error) throw error;
-
-                // Don't use the connection here, it has been returned to the pool.
+                return callback("Info : No such order exists");
             }
-            return callback(results);
-            
         });
     });
 }
 
 exports.orderSidedish = (orderId, mealId, sidedishId, callback) => {
-    dao.pool.getConnection(function(err, connection) {
-        if (err) throw err; // not connected!
-        
-
+    dao.pool.getConnection(function(error, connection) {
+        if (error) return callback("Error when establishing connection");
         connection.query(`SELECT * FROM meal_sidedish WHERE mealId = '${mealId}' AND sidedishId = '${sidedishId}'`, function (error, results, fields) {
             if(results&&results.length>0){
-                // Use the connection
+                
                 connection.query(`INSERT INTO order_meal_sidedish (orderId, mealId, sidedishId) VALUES ('${orderId}', '${mealId}', '${sidedishId}')`, function (error, results, fields) {
-                    console.log(results);
-                    // When done with the connection, release it.
                     connection.release();
-                                
-                    // Handle error after the release.
-                    if (error) throw error;
+                    if (error){
+                        return callback("Error when inserting order sidedish.");
+                    }
                     return callback(results);
-
-                    // Don't use the connection here, it has been returned to the pool.
-                    
                 });
             }else{
-                console.log('no such meal_sidedish');
                 connection.release();
+                return callback('Info : No such sidedish exists for that order');
             }
             return callback(results);
-            
         });
-
-
-        
     });
     
 }

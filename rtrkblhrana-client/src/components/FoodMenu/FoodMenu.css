@@ -38,23 +38,42 @@
     color: white !important;
 }
 
+.menu-buttons-wrapper{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: center;
+    margin: auto;
+    margin-top: 2%;
+}
+
 .menu-button{
     margin: auto;
-    width: 95% !important;
-    margin-top: 2%;
+    width: 40% !important;
+    text-align: center;
 }
 
 .menu-button:hover{
     opacity: 0.9;
 }
 
-.menu-button-light{
-    background-color: rgb(203, 206, 216) !important;
+.menu-button-light-red{
+    background-color: rgb(255, 102, 102) !important;
     color: rgb(58, 54, 54) !important;
 }
 
-.menu-button-dark{
-    background-color: rgb(36, 35, 35) !important;
+.menu-button-dark-red{
+    background-color: rgb(255, 57, 57) !important;
+    color: white !important;
+}
+
+.menu-button-light-green{
+    background-color: rgb(114, 253, 146) !important;
+    color: rgb(58, 54, 54) !important;
+}
+
+.menu-button-dark-green{
+    background-color: rgb(50, 208, 82) !important;
     color: white !important;
 }
 
@@ -71,8 +90,29 @@
     margin-top: 10%;
 }
 
+.location-time-wrapper{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.locations{
+    margin-left: 5%;
+}
+
+.times{
+    margin-right: 5%;
+}
+
 @media only screen and (max-width : 600px){
     .menu-button{
+        width: 100% !important;
+        margin-top: 1%;
+        margin-bottom: 1%;
+    }
+
+    .menu-buttons-wrapper{
         width: 90% !important;
     }
 }

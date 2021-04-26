@@ -16,8 +16,11 @@ class FoodMenu extends Component {
         specialSidedishes : null,
         selectedMealId : null,
         selectedSideDishes: [],
-        loading: true
-
+        loading: true,
+        selectedLocationId : 1,
+        selectedTimeId : 1,
+        locations : null,
+        times: null
     }
 
     componentWillMount(){
@@ -96,6 +99,40 @@ class FoodMenu extends Component {
             console.log(error);
             this.props.history.push('/');
         })
+
+        axios.get('/location', {
+            headers:{
+                'Content-type' : 'application/json'
+            }
+        }).then(response=>{
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                this.setState({
+                    locations : response.data
+                })
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
+        })
+
+        axios.get('/time', {
+            headers:{
+                'Content-type' : 'application/json'
+            }
+        }).then(response=>{
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                this.setState({
+                    times : response.data
+                })
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
+        })
     }
 
     mapMeals = (meals, special = false) => {
@@ -118,6 +155,64 @@ class FoodMenu extends Component {
                 )
             })
             : null
+        )
+    }
+
+    toggleSelectedLocation = (event) =>{
+        console.log('location', event.target.value)
+        this.setState({
+            selectedLocationId : event.target.value
+        })
+    }
+
+    toggleSelectedTime = (event) =>{
+        console.log('time', event.target.value)
+        this.setState({
+            selectedTimeId : event.target.value
+        })
+    }
+
+    mapLocations = () =>{
+        return (
+            this.state.locations&&this.state.locations.length>0?
+            <div className="locations">
+                {
+                    this.state.locations.map((item, index)=>{
+                        return(
+                            <div className={`location-item`} key={item.id}>
+                                <input type="radio" id={`location-${item.id}`} name="location" value={item.id} checked={this.state.selectedLocationId==item.id} type="checkbox" onChange={this.toggleSelectedLocation}/>
+                                <label htmlFor={`location-${item.id}`} className={`global-text-${this.context.theme}`}>{item.name}</label><br/>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            :
+
+            null
+
+        )
+    }
+
+    mapTimes = () =>{
+        return (
+            this.state.times&&this.state.times.length>0?
+            <div className="times">
+                {
+                    this.state.times.map((item, index)=>{
+                        return(
+                            <div className={`time-item`} key={item.id}>
+                                <input type="radio" id={`time-${item.id}`} name="time" value={item.id} checked={this.state.selectedTimeId==item.id} type="checkbox" onChange={this.toggleSelectedTime}/>
+                                <label htmlFor={`time-${item.id}`} className={`global-text-${this.context.theme}`}>{item.chosenTime}</label><br/>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            :
+
+            null
+
         )
     }
 
@@ -149,6 +244,9 @@ class FoodMenu extends Component {
     }
 
     handleSelectionChange = (mealId, newSidedishes, deselect = false) => {
+        console.log('mealId', mealId)
+        console.log('newSidedishes', newSidedishes)
+        console.log('deselect', deselect)
         if(this.state.selectedMealId==mealId&&deselect){
             this.setState({
                 selectedMealId : null,
@@ -169,7 +267,7 @@ class FoodMenu extends Component {
         && (this.state.specialMeals==null||this.state.specialMeals.length==0);
     }
 
-    alertSelection = () => {
+    selectMeal = () => {
         if(this.state.selectedMealId){
             let selectedMeal = this.state.defaultMeals.find(meal => meal.id == this.state.selectedMealId);
             let selectedSidedishes = null;
@@ -180,12 +278,40 @@ class FoodMenu extends Component {
                 if(selectedMeal&&this.state.selectedSideDishes&&this.state.selectedSideDishes.length>0)selectedSidedishes = this.state.specialSidedishes.filter(sidedish => sidedish.mealId==this.state.selectedMealId && this.state.selectedSideDishes.includes(sidedish.sidedishId));
             }
             if(selectedMeal!=null){
-                let alertMessage = `You selected ${selectedMeal.name} with the sidedishes: `;
+                let requestBody = {
+                    date : this.state.currentDate,
+                    mealId : this.state.selectedMealId,
+                    locationId : this.state.selectedLocationId,
+                    timeId : this.state.selectedTimeId,
+                    sideDishes : this.state.selectedSideDishes
+                }
+
+                console.log('requestBody', requestBody);
+
+                axios.post('/order/order', JSON.stringify(requestBody), {
+                    headers:{
+                        'Content-type' : 'application/json'
+                    }
+                }).then(response=>{
+                    console.log(response);
+                    if(response.status == 400){
+                        console.log('client error');
+                    }
+                    if(response.status == 401){
+                        this.props.history.push('/login');
+                    }else{
+                        window.alert('Uspjesno ste narucili obrok za ' + this.state.currentDate)
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                    this.props.history.push('/');
+                })
+                /*let alertMessage = `You selected ${selectedMeal.name} with the sidedishes: `;
                 if(this.state.selectedSideDishes&&this.state.selectedSideDishes.length>0)
                 for(let sideDish of selectedSidedishes){
                     alertMessage += ` ${sideDish.name}`
                 }
-                window.alert(alertMessage);
+                window.alert(alertMessage);*/
             }
             else {
                 let alertMessage = `You selected no meal so far`;
@@ -196,7 +322,30 @@ class FoodMenu extends Component {
             let alertMessage = `You selected no meal so far`;
             window.alert(alertMessage);
         }
-        
+    }
+
+    cancelOrder = () => {
+        let requestBody = {
+            date : this.state.currentDate
+        }
+        axios.post('/order/delete', JSON.stringify(requestBody), {
+            headers:{
+                'Content-type' : 'application/json'
+            }
+        }).then(response=>{
+            console.log(response);
+            if(response.status == 400){
+                console.log('client error');
+            }
+            if(response.status == 401){
+                this.props.history.push('/login');
+            }else{
+                window.alert('Uspjesno ste otkazali narudzbu za ' + this.state.currentDate)
+            }
+        }).catch(error=>{
+            console.log(error);
+            this.props.history.push('/');
+        })
     }
 
     render() { 
@@ -233,7 +382,15 @@ class FoodMenu extends Component {
                 <div className={`menu-default global-background-${this.context.theme}`}>
                     {this.mapMeals(this.state.defaultMeals, false)}
                 </div>
-                <button className={`btn btn-block menu-button menu-button-${this.context.theme}`} onClick={this.alertSelection}>Selection</button>
+                <div className={`location-time-wrapper global-background-${this.context.theme}`}>
+                    {this.mapLocations()}
+                    {this.mapTimes()}
+                </div>
+                <div className="menu-buttons-wrapper">
+                    <button className={`btn menu-button menu-button-${this.context.theme}-green`} onClick={this.selectMeal}>Odaberi</button>
+                    <button className={`btn menu-button menu-button-${this.context.theme}-red`} onClick={this.cancelOrder}>Otkazi narudzbu</button>
+                </div>
+                
             </div> 
          );
     }
