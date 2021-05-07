@@ -10,7 +10,7 @@ class WelcomeComponent extends Component {
 
     
 
-    loginWithCookie=(context, history, nextRoute)=>{
+    loginWithCookie=()=>{
         axios.post("/user/login", {})
         .then(response=>{
             if(response.status==200){
@@ -29,8 +29,13 @@ class WelcomeComponent extends Component {
     componentDidMount(){
         let authCookie = Cookies.get('auth');
         if(authCookie){
+            console.log('auth is there', authCookie);
             util.loginWithCookie(this.context, this.props.history, '/order')
-        }else this.props.history.push('/login');
+        }else{
+            
+            console.log('auth is undefined');
+            this.props.history.push('/login');
+        }
     }
 
     render() { 

@@ -20,6 +20,13 @@ exports.getAllOrdersByUser = (userId, callback) => {
     getOrderByParameter(`userId = '${userId}'`, callback);
 }
 
+exports.getAllOrdersByUserJoined = (userId, callback) => {
+    let queryString = `SELECT * FROM meal_order JOIN meal ON meal_order.mealId = meal.id JOIN meal_sidedish ON meal_sidedish.mealid = meal.id WHERE userId = '${userId}'`; 
+    dao.sendQuery(queryString, (response)=>{
+        return callback(response)
+    });
+}
+
 exports.getAllOrdersByUserAndDate = (userId, date, callback) => {
     getOrderByParameter(`userId = '${userId}' and date = '${date}'`, callback);
 }
@@ -57,12 +64,13 @@ exports.orderMeal = (userId, date, mealId, locationId, timeId, sideDishes, callb
             connection.release();
             return callback("Error when establishing connection"); 
         }
-        connection.query(`INSERT INTO meal_order (userId, date, mealId, locationId, timeId) VALUES ('${userId}', '${date}', '${mealId}', '${locationId}', '${timeId}') ON DUPLICATE KEY UPDATE mealId = '${mealId}', locationId= '${locationId}', timeId = '${timeId}'`, function (error, results, fields) {
+        connection.query(`INSERT INTO meal_order (userId, date, mealId, locationId, timeId) VALUES ('${userId}', '${date}', '${mealId}', '${locationId}', '${timeId}') ON DUPLICATE KEY UPDATE mealId = '${mealId}', locationId= '${locationId}', timeId = '${timeId}', isCanceled = 'false'`, function (error, results, fields) {
             if(error){
                 connection.release();
                 return callback("Error when establishing connection.");
             }
             let orderId = results.insertId;
+            console.log('orderId', orderId);
 
             if(orderId==0){
                 connection.query(`SELECT * FROM meal_order WHERE userId = '${userId}' AND date = '${date}'`, function (error, results, fields) {

@@ -27,6 +27,7 @@ class App extends Component {
         },
 
         setIsLogged : (isLogged) => {
+            console.log('ISLOGGED CALLED', isLogged)
             this.setState({
                 isLogged : isLogged
             })

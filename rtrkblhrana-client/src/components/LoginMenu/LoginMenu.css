@@ -36,6 +36,14 @@
     margin-bottom: 1%;
 }
 
+.invalidCredentialsLabel-light{
+    color: rgb(250, 74, 74) !important;
+}
+
+.invalidCredentialsLabel-dark{
+    color: rgb(172, 41, 41) !important;
+}
+
 .loginInput{
     margin-bottom: 4%;
 }

@@ -9,6 +9,20 @@ const unauthorizedGuard = util.unauthorizedGuard;
 
 router.use((req, res, next) => unauthorizedGuard(req, res, next));
 
+sidedishMap = new Map();
+
+const NO_SIDEDISH = 5;
+
+var curentMonth = new Date().getMonth();
+
+sidedishDao.getAllSidedishes(result => {
+    for(let sidedish of result)
+    {
+        sidedishMap[sidedish.id] = sidedish.name;
+    }
+    console.log(sidedishMap);
+})
+
 router.get('/', (req, res) => {
     res.send("Welcome to login");
 });
@@ -58,11 +72,36 @@ router.post('/user/all', (req, res) => {
     console.log('ORDER DELETE');
     console.log('userId', userId);
     if(userId!=null){
-        orderDao.getAllOrdersByUser(userId, result => {
+        orderDao.getAllOrdersByUserJoined(userId, result => {
             if(result&&result.toString().includes('Error')){
                 res.status(400).json(result);
             }else{
-                res.status(200).json(result);
+                let meals = [];
+                for(let meal of result){
+                    let foundItem = meals.find(item => item.id == meal.id);
+                    if(foundItem!=null){
+                        let sidedishObject = {
+                            sidedishId: meal.sidedishId,
+                            mealId : meal.mealId,
+                            name : sidedishMap[meal.sidedishId]
+                        };
+                        foundItem.sidedishes.push(sidedishObject);
+                    }
+                    else{
+                        if(meal.sidedishId != NO_SIDEDISH){
+                            meal.sidedishes = [];
+                            let sidedishObject = {
+                                sidedishId: meal.sidedishId,
+                                mealId : meal.mealId,
+                                name : sidedishMap[meal.sidedishId]
+                            };
+                            meal.sidedishes.push(sidedishObject);
+                        }
+                        delete meal.sidedishId;
+                        meals.push(meal);
+                    }
+                }
+                res.status(200).json(meals);
             }
         })
     }else{

@@ -5,13 +5,16 @@ const loginWithCookie=(context, history, nextRoute)=>{
     .then(response=>{
         if(response.status==200){
            history.push(nextRoute);
+           console.log('CONTEXT IN UTIL TRUE')
            context.setIsLogged(true);
         }
         else{
+            console.log('CONTEXT IN UTIL FALSE')
             context.setIsLogged(false);
             history.push(nextRoute);
         }
     }).catch(err=>{
+        console.log('CONTEXT IN UTIL FALSE')
         context.setIsLogged(false);
         console.log(err)
     })

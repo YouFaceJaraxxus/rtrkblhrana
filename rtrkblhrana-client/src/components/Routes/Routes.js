@@ -6,6 +6,7 @@ import SettingsMenu from '../SettingsMenu/SettingsMenu';
 import AdminMenu from '../AdminMenu/AdminMenu';
 import HeaderComponent from '../HeaderComponent/HeaderComponent';
 import WelcomeComponent from '../WelcomeComponent/WelcomeComponent';
+import OrderList from '../OrderList/OrderList';
 import { withRouter } from 'react-router';
 
 class Routes extends Component {
@@ -20,6 +21,7 @@ class Routes extends Component {
                     <Route exact path="/" component={WelcomeComponent}/>
                     <Route exact path="/login" component={LoginMenu}/>
                     <Route exact path="/order" component={FoodMenu}/>
+                    <Route exact path="/orders" component={OrderList}/>
                     <Route exact path="/settings" component={SettingsMenu}/>
                     <Route exact path="/admin" component={AdminMenu}/>
                     <Route path="*" component={WelcomeComponent}/>

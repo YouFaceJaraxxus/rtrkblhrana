@@ -1,12 +1,19 @@
 const dao = require('./dao');
 
-
+const SIDEDISH_SELECT_STRING = 'SELECT * FROM sidedish';
 const MEAL_SIDEDISH_SELECT_STRING = 'SELECT * FROM meal_sidedish';
 const MEAL_SIDEDISH_SELECT_JOIN_SIDEDISH_STRING = 'SELECT * FROM meal_sidedish JOIN sidedish ON sidedish.id = meal_sidedish.sidedishId';
 const MEAL_SIDEDISH_SELECT_JOIN_MEAL_STRING = 'SELECT * FROM meal_sidedish JOIN meal ON meal.id = meal_sidedish.mealId';
 const MEAL_SIDEDISH_UPDATE_STRING = 'UPDATE meal_sidedish';
 
 
+
+exports.getAllSidedishes = (callback) => {
+    let queryString = `${SIDEDISH_SELECT_STRING}`; 
+    dao.sendQuery(queryString, (response)=>{
+        return callback(response)
+    });
+}
 
 exports.getAllMealSidedishes = (callback) => {
     let queryString = `${MEAL_SIDEDISH_SELECT_STRING}`; 

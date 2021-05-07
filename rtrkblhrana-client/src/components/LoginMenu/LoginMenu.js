@@ -8,7 +8,12 @@ import GlobalContext from '../../GlobalContext';
 class LoginMenu extends Component {
     state = { 
         email:"",
-        password:""
+        password:"",
+        credentialsInvalid : false
+     }
+
+     componentDidMount(){
+         this.context.setIsLogged(false);
      }
 
      
@@ -33,10 +38,17 @@ class LoginMenu extends Component {
              }
          })
          .then(response=>{
+             this.setState({
+                credentialsInvalid : false
+             })
              if(response.status==200){
+                this.context.setIsLogged(true);
                 this.props.history.push('/order');
              }
          }).catch(err=>{
+            this.setState({
+                credentialsInvalid : true
+             })
              console.log(err)
          })
      }
@@ -57,6 +69,9 @@ class LoginMenu extends Component {
                     <label className={`loginLabel global-text-${this.context.theme}`} htmlFor="password">Lozinka:</label>
                     <input className="loginInput" placeholder="Password" type="password" name="password" value={this.state.password} onChange={this.handlePasswordChange}></input>
                     <button className={`loginButton loginButton-${this.context.theme} btn btn-block`} onClick={this.login}>Login</button>
+                    {
+                        this.state.credentialsInvalid? <label className={`invalidCredentialsLabel-${this.context.theme}`}>Ne postoji korisnik sa takvim kredencijalima.</label> : null
+                    }
                 </form>
             </div>
          );

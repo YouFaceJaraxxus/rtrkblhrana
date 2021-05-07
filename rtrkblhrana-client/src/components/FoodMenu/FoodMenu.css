@@ -25,6 +25,43 @@
     margin-top: 1%;
 }
 
+.date-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-flow: row wrap;
+    margin: auto;
+    width: 50%;
+}
+
+.date-day-text{
+    text-align: center;
+    margin: auto;
+}
+
+input[type="date"]
+  [type="date"]::-webkit-inner-spin-button {
+    display: none;
+  }
+  [type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+}
+
+.date-picker{
+    text-align: center;
+    margin: auto;
+    border : none;
+    background: url('../../assets/custom_date_icon_light.png')  97% 50% no-repeat !important;
+}
+
+.date-picker-light{
+    background: url('../../assets/custom_date_icon_light.png')  97% 50% no-repeat !important;
+}
+
+.date-picker-dark{
+    background: url('../../assets/custom_date_icon_dark.png')  97% 50% no-repeat !important;
+}
+
 .navigation-chevron:hover{
     opacity: 0.9;
     cursor: pointer;
@@ -114,5 +151,13 @@
 
     .menu-buttons-wrapper{
         width: 90% !important;
+    }
+
+    .date-day-text{
+        width: 100%;
+    }
+    
+    .date-picker{
+        width: 100%;
     }
 }

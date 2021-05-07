@@ -3,24 +3,25 @@ import axios from 'axios';
 import moment from 'moment';
 import FoodItem from '../FoodItem/FoodItem';
 import './FoodMenu.css';
-import ClipLoader from "react-spinners/ClipLoader";
+import ClipLoader from 'react-spinners/ClipLoader';
 import GlobalContext from "../../GlobalContext";
 import {getLocalDay} from '../../util.js'
+import {DatePicker} from 'react-datepicker';
 
 class FoodMenu extends Component {
     state = { 
         currentDate : moment('20210401').format('YYYY-MM-DD'),
         defaultMeals : null,
         specialMeals : null,
-        defaultSidedishes : null,
-        specialSidedishes : null,
         selectedMealId : null,
         selectedSideDishes: [],
-        loading: true,
+        loadingAll: true,
+        loadingSpecials: false,
         selectedLocationId : 1,
         selectedTimeId : 1,
         locations : null,
-        times: null
+        times: null,
+        orders : null
     }
 
     componentWillMount(){
@@ -39,6 +40,7 @@ class FoodMenu extends Component {
             if(response.status == 401){
                 this.props.history.push('/login');
             }else{
+                this.context.setIsLogged(true);
                 this.setState({
                     defaultMeals : response.data
                 })
@@ -58,41 +60,6 @@ class FoodMenu extends Component {
             }else{
                 this.setState({
                     specialMeals : response.data
-                })
-            }
-        }).catch(error=>{
-            console.log(error);
-            this.props.history.push('/');
-        })
-
-        axios.get('/food/sidedish/default', {
-            headers:{
-                'Content-type' : 'application/json'
-            }
-        }).then(response=>{
-            if(response.status == 401){
-                this.props.history.push('/login');
-            }else{
-                this.setState({
-                    defaultSidedishes : response.data
-                })
-            }
-        }).catch(error=>{
-            console.log(error);
-            this.props.history.push('/');
-        })
-
-        axios.post('/food/sidedish/special/date', body, {
-            headers:{
-                'Content-type' : 'application/json'
-            }
-        }).then(response=>{
-            if(response.status == 401){
-                this.props.history.push('/login');
-            }else{
-                this.setState({
-                    specialSidedishes : response.data,
-                    loading : false
                 })
             }
         }).catch(error=>{
@@ -126,31 +93,54 @@ class FoodMenu extends Component {
                 this.props.history.push('/login');
             }else{
                 this.setState({
-                    times : response.data
+                    times : response.data,
+                    loadingAll : false
                 })
             }
         }).catch(error=>{
             console.log(error);
             this.props.history.push('/');
         })
+
+        axios.post('/order/user/all')
+        .then(response => {
+            console.log('orders', response.data);
+            let orders = response.data;
+            if(orders){
+                orders = orders
+            }
+            this.setState({
+                orders : response.data
+            })
+        })
     }
 
     mapMeals = (meals, special = false) => {
         let selectedMealId = this.state.selectedMealId;
-        let sidedishList = special ? this.state.specialSidedishes : this.state.defaultSidedishes;
+        let keyId = 1;
         return (
             meals&&meals.length>0 ?
             meals.map((item, index) => {
-                let sidedishes = sidedishList? sidedishList.filter(sidedish => sidedish.mealId == item.id) : null;
+                let startingSelection = null;
+                if(this.state.orders&&this.state.orders.length>0){
+                    let order = this.state.orders.find(orderItem => orderItem.mealId==item.mealId&&orderItem.date==item.date)
+                    if(order){
+                        startingSelection = {
+                            mealId : order.mealId,
+                            sidedishes : order.sidedishes
+                        }
+                    }
+                }
                 return(
                     <FoodItem 
-                        key={item.id}
-                        id = {item.id}
+                        key={item.mealId}
+                        mealId = {item.mealId}
                         mealName = {item.name}
                         isSpecial = {item.isSpecial}
                         isSelected = {item.id == selectedMealId}
                         selectionChangeHandler = {this.handleSelectionChange}
-                        sideDishes = {sidedishes}
+                        sideDishes = {item.sidedishes}
+                        startingSelection = {startingSelection}
                     ></FoodItem>
                 )
             })
@@ -221,10 +211,14 @@ class FoodMenu extends Component {
         if(day=='Friday') {
             this.setState({
                 currentDate : moment(this.state.currentDate).add(3, 'days').format('YYYY-MM-DD')
+            }, () => {
+                this.loadSpecialsByDate(this.state.currentDate);
             })
         }else{
             this.setState({
                 currentDate : moment(this.state.currentDate).add(1, 'days').format('YYYY-MM-DD')
+            }, () => {
+                this.loadSpecialsByDate(this.state.currentDate);
             })
         }
         
@@ -235,12 +229,77 @@ class FoodMenu extends Component {
         if(day=='Monday') {
             this.setState({
                 currentDate : moment(this.state.currentDate).add(-3, 'days').format('YYYY-MM-DD')
+            }, () => {
+                this.loadSpecialsByDate(this.state.currentDate);
             })
         }else{
             this.setState({
                 currentDate : moment(this.state.currentDate).add(-1, 'days').format('YYYY-MM-DD')
+            }, () => {
+                this.loadSpecialsByDate(this.state.currentDate);
             })
         }
+    }
+
+    datePickerChangeDate = (event) =>{
+        let date = event.target.value;
+        console.log('datePickerChangeDate called', date);
+        let momentDate = moment(date);
+
+        momentDate.month(new Date().getMonth()); //or switch up with ACTIVE MONTH RATHER
+        momentDate.year(new Date().getFullYear());
+
+        
+        //this piece of code handles a possible selection of a weekend day
+        //it sets the date to the first monday of the monthmys
+        let weekDay = momentDate.isoWeekday();
+        if(weekDay == 6 || weekDay== 7){
+            momentDate.date(1);
+            weekDay = momentDate.isoWeekday();
+            if(weekDay==6){
+                momentDate.date(3);
+            }else{
+                momentDate.date(2);
+            }
+        }
+
+
+        date = momentDate.format('YYYY-MM-DD')
+        this.loadSpecialsByDate(date);
+        this.setState({
+            currentDate : date
+        })
+    }
+
+
+    loadSpecialsByDate = (date) => {
+        let body = JSON.stringify({
+            date : date
+        })
+
+        this.setState({
+            loadingSpecials : true
+        }, () => {
+            axios.post('/food/special/date', body, {
+                headers:{
+                    'Content-type' : 'application/json'
+                }
+            }).then(response=>{
+                if(response.status == 401){
+                    this.props.history.push('/login');
+                }else{
+                    this.setState({
+                        specialMeals : response.data,
+                        loadingSpecials: false
+                    })
+                }
+            }).catch(error=>{
+                console.log(error);
+                this.props.history.push('/');
+            })
+        })
+
+        
     }
 
     handleSelectionChange = (mealId, newSidedishes, deselect = false) => {
@@ -270,12 +329,8 @@ class FoodMenu extends Component {
     selectMeal = () => {
         if(this.state.selectedMealId){
             let selectedMeal = this.state.defaultMeals.find(meal => meal.id == this.state.selectedMealId);
-            let selectedSidedishes = null;
-            if(selectedMeal){
-                if(this.state.selectedSideDishes&&this.state.selectedSideDishes.length>0)selectedSidedishes = this.state.defaultSidedishes.filter(sidedish => sidedish.mealId==this.state.selectedMealId && this.state.selectedSideDishes.includes(sidedish.sidedishId));
-            }else{
+            if(!selectedMeal){
                 selectedMeal = this.state.specialMeals.find(meal => meal.id == this.state.selectedMealId);
-                if(selectedMeal&&this.state.selectedSideDishes&&this.state.selectedSideDishes.length>0)selectedSidedishes = this.state.specialSidedishes.filter(sidedish => sidedish.mealId==this.state.selectedMealId && this.state.selectedSideDishes.includes(sidedish.sidedishId));
             }
             if(selectedMeal!=null){
                 let requestBody = {
@@ -350,9 +405,9 @@ class FoodMenu extends Component {
 
     render() { 
         return ( 
-            this.state.loading ? 
+            this.state.loadingAll ? 
             <div className="custom-spinner-wrapper">
-                <ClipLoader color="blue" loading={this.state.loading} size={300} />
+                <ClipLoader color="blue" loading={this.state.loadingAll} size={300} />
             </div>
 
             :
@@ -370,14 +425,26 @@ class FoodMenu extends Component {
             <div className={`menu-wrapper global-background-${this.context.theme}`}>
                 <div className = "menu-navigation-wrapper">
                     <i className={`fa fa-chevron-left food-card-text-${this.context.theme} navigation-chevron`} onClick={this.decrementDate}></i>
-                    <div className={`food-card-text-${this.context.theme}`}>
-                        {getLocalDay(moment(this.state.currentDate).format('dddd'))}, {moment(this.state.currentDate).format('DD-MM-YYYY')}
+                    <div className={`date-wrapper`}>
+                        <div className={`food-card-text-${this.context.theme} date-day-text`}>
+                            {getLocalDay(moment(this.state.currentDate).format('dddd'))}
+                        </div>
+                        <input value={this.state.currentDate} onChange={this.datePickerChangeDate} type="date" className={`global-text-${this.context.theme} global-background-${this.context.theme} date-picker date-picker-${this.context.theme}`}></input>
                     </div>
+                    
                     <i className={`fa fa-chevron-right food-card-text-${this.context.theme} navigation-chevron`} onClick={this.incrementDate}></i>
                 </div>
-                <div className={`menu-special global-background-${this.context.theme}`}>
-                    {this.mapMeals(this.state.specialMeals, true)}
-                </div>
+                {
+                    this.state.loadingSpecials ? 
+                    <div className="custom-spinner-wrapper">
+                        <ClipLoader color="blue" loading={this.state.loadingSpecials} size={300} />
+                    </div> 
+                        : 
+                    <div className={`menu-special global-background-${this.context.theme}`}>
+                        {this.mapMeals(this.state.specialMeals, true)}
+                    </div>
+                }
+                
                 <hr/>
                 <div className={`menu-default global-background-${this.context.theme}`}>
                     {this.mapMeals(this.state.defaultMeals, false)}
