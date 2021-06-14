@@ -62,15 +62,15 @@ class LoginMenu extends Component {
 
     render() { 
         return ( 
-            <div id="mainWrapper">
+            <div id="mainWrapper" className={`global-background-${this.context.theme}`}>
                 <form id="mainForm" className={`mainForm-${this.context.theme}`} method="POST" action={DATA_SERVER+"/user/login"} onSubmit={e => { e.preventDefault(); }}>
                     <label className={`loginLabel global-text-${this.context.theme}`} htmlFor="email">E-mail:</label>
                     <input className="loginInput" placeholder="E-mail" type="text" name="email" value={this.state.email} onChange={this.handleEmailChange}></input> 
                     <label className={`loginLabel global-text-${this.context.theme}`} htmlFor="password">Lozinka:</label>
-                    <input className="loginInput" placeholder="Password" type="password" name="password" value={this.state.password} onChange={this.handlePasswordChange}></input>
-                    <button className={`loginButton loginButton-${this.context.theme} btn btn-block`} onClick={this.login}>Login</button>
+                    <input className="loginInput" placeholder="Lozinka" type="password" name="password" value={this.state.password} onChange={this.handlePasswordChange}></input>
+                    <button className={`loginButton loginButton-${this.context.theme} btn btn-block`} onClick={this.login}>Prijavi se</button>
                     {
-                        this.state.credentialsInvalid? <label className={`invalidCredentialsLabel-${this.context.theme}`}>Ne postoji korisnik sa takvim kredencijalima.</label> : null
+                        this.state.credentialsInvalid? <label className={`invalidCredentialsLabel-${this.context.theme}`}>Ne postoji korisnik sa unesenim kredencijalima.</label> : null
                     }
                 </form>
             </div>

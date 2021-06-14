@@ -1,0 +1,25 @@
+.order-list-wrapper{
+    padding: 1%;
+}
+
+.loader-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10%;
+}
+
+.order-list-table{
+    width: 100%;
+    margin: auto;
+}
+
+.order-list-header-dark{
+    color: white;
+    border-bottom: 1px solid white;
+}
+
+.order-list-header-light{
+    color: black;
+    border-bottom: 1px solid black;
+}

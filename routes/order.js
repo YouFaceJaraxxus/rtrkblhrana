@@ -20,7 +20,6 @@ sidedishDao.getAllSidedishes(result => {
     {
         sidedishMap[sidedish.id] = sidedish.name;
     }
-    console.log(sidedishMap);
 })
 
 router.get('/', (req, res) => {
@@ -69,7 +68,6 @@ router.post('/delete', (req, res) => {
 
 router.post('/user/all', (req, res) => {
     let userId = req.body.userId&&req.body.currentUser.isAdmin==1 ? req.body.userId : req.body.currentUser.id;
-    console.log('ORDER DELETE');
     console.log('userId', userId);
     if(userId!=null){
         orderDao.getAllOrdersByUserJoined(userId, result => {
@@ -112,7 +110,6 @@ router.post('/user/all', (req, res) => {
 router.post('/user/date', (req, res) => {
     let userId = req.body.userId&&req.body.currentUser.isAdmin==1 ? req.body.userId : req.body.currentUser.id;
     let date = req.body.date;
-    console.log('ORDER DELETE');
     console.log('userId', userId);
     console.log('date', date);
     if(date!=null&&userId!=null){

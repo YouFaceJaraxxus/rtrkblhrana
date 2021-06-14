@@ -1,0 +1,26 @@
+.list-item-dark{
+    border-bottom: 1px dotted white;
+}
+
+.list-item-light{
+    border-bottom: 1px dotted black;
+}
+
+.list-item-icon:hover{
+    opacity: 0.9;
+}
+
+.sidedishes-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: row nowrap;
+}
+
+.list-item-icon-close-light{
+    color: rgb(255, 102, 102) !important;
+}
+
+.list-item-icon-close-dark{
+    color: rgb(255, 57, 57) !important;
+}

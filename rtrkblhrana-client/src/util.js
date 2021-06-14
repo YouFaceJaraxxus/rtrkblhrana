@@ -29,16 +29,26 @@ const daysMap = new Map([
 ])
 
 const getLocalStorageItem = (key, defaultValue) => {
-    let value = global.window.localStorage.getItem(key);
+    let value = window.localStorage.getItem(key);
     return value==null? defaultValue : value;
+}
+
+const setLocalStorageItem = (key, value) => {
+    window.localStorage.setItem(key, value);
 }
 
 const getLocalDay = (englishDay) => {
     return daysMap.get(englishDay);
 }
 
+const mapLoaderTheme = (theme) => {
+    return theme=='dark' ? 'white' : 'black';
+}
+
 export {
     loginWithCookie,
     getLocalStorageItem,
-    getLocalDay
+    setLocalStorageItem,
+    getLocalDay,
+    mapLoaderTheme
 }

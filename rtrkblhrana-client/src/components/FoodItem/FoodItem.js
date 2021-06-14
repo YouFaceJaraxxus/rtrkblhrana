@@ -5,6 +5,7 @@ import GlobalContext from '../../GlobalContext'
 import axios from 'axios';
 import 'react-slidedown/lib/slidedown.css'
 import ClipLoader from 'react-spinners/ClipLoader';
+import {mapLoaderTheme} from '../../util';
 
 class FoodItem extends Component {
     state = { 
@@ -32,17 +33,26 @@ class FoodItem extends Component {
     }
 
     componentDidMount(){
-        if(this.props.isSpecial){
+        let tryStart = true;
+        let tryGetSelection = setInterval(()=>{ //try to get an object from the parent
             if(this.props.startingSelection){
-                this.toggleSelectedMeal();
-                console.log('startingSelection', this.props.startingSelection)
-                this.setState({
-                    selectedSideDishes : this.props.startingSelection.sidedishes.map(sidedish => sidedish.sidedishId)
-                }, () => {
-                    console.log('dishes state', this.state.selectedSideDishes)
-                    this.props.selectionChangeHandler(this.props.startingSelection.mealId, this.state.selectedSideDishes, false)
-                })
+                if(this.props.startingSelection.mealId) //not an empty object
+                {
+                    this.toggleSelectedMeal();
+                    console.log('startingSelection', this.props.startingSelection)
+                    this.setState({
+                        selectedSideDishes : this.props.startingSelection.sidedishes.map(sidedish => sidedish.sidedishId)
+                    }, () => {
+                        console.log('dishes state', this.state.selectedSideDishes)
+                        this.props.selectionChangeHandler(this.props.startingSelection.mealId, this.state.selectedSideDishes, false)
+                    })
+                }
+                tryStart = false;
+                clearInterval(tryGetSelection);
             }
+        }, 1000);
+        
+        if(this.props.isSpecial){
             let url = `/food/grade/${this.props.mealId}`;
             console.log('grade url', url);
             axios.get(url)
@@ -131,7 +141,7 @@ class FoodItem extends Component {
                                 this.state.ratingsLoading ? 
 
                                 <div className="food-item-clip-loader">
-                                    <ClipLoader color="blue" loading={this.state.loadingAll} size={50} />
+                                    <ClipLoader color={mapLoaderTheme(this.context.theme)} loading={this.state.loadingAll} size={50} />
                                 </div>
                                 
                                 :
@@ -141,13 +151,13 @@ class FoodItem extends Component {
                                     <b>{this.state.rating}</b>
                                 </div>
                                 <StarRatings
-                                        rating={this.state.rating}
-                                        starRatedColor="blue"
-                                        changeRating={this.changeRating}
-                                        numberOfStars={5}
-                                        name='rating'
-                                        starDimension = {"1.5em"}
-                                        starSpacing = {"0.5em"}
+                                    rating={this.state.rating}
+                                    starRatedColor="blue"
+                                    changeRating={this.changeRating}
+                                    numberOfStars={5}
+                                    name='rating'
+                                    starDimension = {"1.5em"}
+                                    starSpacing = {"0.5em"}
                                 />
 
                                 

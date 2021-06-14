@@ -21,7 +21,6 @@ sidedishDao.getAllSidedishes(result => {
     {
         sidedishMap[sidedish.id] = sidedish.name;
     }
-    console.log(sidedishMap);
 })
 
 currentMonthDao.getCurrentMonth(result => {

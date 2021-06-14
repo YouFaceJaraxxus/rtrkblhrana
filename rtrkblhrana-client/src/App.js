@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import GlobalContext from './GlobalContext'
 import Routes from './components/Routes/Routes';
 import './App.css';
-import {getLocalStorageItem} from './util.js'
+import {getLocalStorageItem, setLocalStorageItem} from './util.js'
 
 class App extends Component {
 

@@ -1,0 +1,115 @@
+.main-settings-wrapper{
+    padding: 1%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.settings-half{
+    width: 48%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-block{
+    width: 100%;
+    margin: auto;
+    margin-bottom: 4%;
+}
+
+.settings-row{
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-title{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: 500;
+    margin: 1% 0 3.5% 0;
+}
+
+.settings-checkbox-label{
+    display: inline;
+    margin-left: 1%;
+    font-size: 0.9em !important;
+}
+
+.settings-radio-row{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 100%;
+}
+
+.settings-radio-label{
+    margin-bottom: 0 !important;
+    margin-left: 3%;
+}
+
+.settings-checkbox-label:hover, .settings-radio-label:hover{
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+.settings-checkbox-label-light{
+    color: rgb(58, 54, 54) !important;
+}
+
+.settings-checkbox-label-dark{
+    color: white !important;
+}
+
+#settings-form{
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items:center;
+}
+
+.settings-button-light{
+    background-color: rgb(203, 206, 216) !important;
+    color: rgb(58, 54, 54) !important;
+}
+
+.settings-button-dark{
+    background-color: rgb(36, 35, 35) !important;
+    color: white !important;
+}
+
+.settings-label{
+    margin-bottom: 1%;
+}
+
+.invalid-credentials-label-light{
+    color: rgb(250, 74, 74) !important;
+}
+
+.invalid-credentials-label-dark{
+    color: rgb(172, 41, 41) !important;
+}
+
+.settings-input{
+    margin-bottom: 2%;
+}
+
+.settings-button{
+    margin-top: 3%;
+}
+
+@media only screen and (max-width : 700px){
+    .settings-half{
+        margin-top: 5%;
+        width: 100%;
+    }
+}

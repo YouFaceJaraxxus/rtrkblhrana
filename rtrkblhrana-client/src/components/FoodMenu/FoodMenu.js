@@ -5,8 +5,8 @@ import FoodItem from '../FoodItem/FoodItem';
 import './FoodMenu.css';
 import ClipLoader from 'react-spinners/ClipLoader';
 import GlobalContext from "../../GlobalContext";
-import {getLocalDay} from '../../util.js'
-import {DatePicker} from 'react-datepicker';
+import {getLocalDay, getLocalStorageItem} from '../../util.js'
+import {mapLoaderTheme} from '../../util';
 
 class FoodMenu extends Component {
     state = { 
@@ -29,9 +29,19 @@ class FoodMenu extends Component {
     }
 
     componentDidMount(){
+        let date = this.props.location.date;
+        console.log('DATE prop', date)
+        if(date){
+            date = moment(date).format('YYYY-MM-DD');
+            this.setState({
+                currentDate : date
+            })
+        }else date = this.state.currentDate;
+
         let body = JSON.stringify({
-            date : this.state.currentDate
+            date : date
         })
+
         axios.get('/food/default', {
             headers:{
                 'Content-type' : 'application/json'
@@ -46,6 +56,7 @@ class FoodMenu extends Component {
                 })
             }
         }).catch(error=>{
+            this.context.setIsLogged(false);
             console.log(error);
             this.props.history.push('/');
         })
@@ -63,6 +74,7 @@ class FoodMenu extends Component {
                 })
             }
         }).catch(error=>{
+            this.context.setIsLogged(false);
             console.log(error);
             this.props.history.push('/');
         })
@@ -80,6 +92,7 @@ class FoodMenu extends Component {
                 })
             }
         }).catch(error=>{
+            this.context.setIsLogged(false);
             console.log(error);
             this.props.history.push('/');
         })
@@ -98,6 +111,7 @@ class FoodMenu extends Component {
                 })
             }
         }).catch(error=>{
+            this.context.setIsLogged(false);
             console.log(error);
             this.props.history.push('/');
         })
@@ -113,6 +127,13 @@ class FoodMenu extends Component {
                 orders : response.data
             })
         })
+
+        let defaultLocation = getLocalStorageItem('defaultLocation', 1);
+        let defaultTime = getLocalStorageItem('defaultTime', 1);
+        this.setState({
+            selectedLocationId : defaultLocation,
+            selectedTimeId : defaultTime
+        })
     }
 
     mapMeals = (meals, special = false) => {
@@ -125,11 +146,12 @@ class FoodMenu extends Component {
                 if(this.state.orders&&this.state.orders.length>0){
                     let order = this.state.orders.find(orderItem => orderItem.mealId==item.mealId&&orderItem.date==item.date)
                     if(order){
+                        console.log('we have orders for this date', order);
                         startingSelection = {
                             mealId : order.mealId,
                             sidedishes : order.sidedishes
                         }
-                    }
+                    }else startingSelection = {}
                 }
                 return(
                     <FoodItem 
@@ -170,7 +192,7 @@ class FoodMenu extends Component {
                     this.state.locations.map((item, index)=>{
                         return(
                             <div className={`location-item`} key={item.id}>
-                                <input type="radio" id={`location-${item.id}`} name="location" value={item.id} checked={this.state.selectedLocationId==item.id} type="checkbox" onChange={this.toggleSelectedLocation}/>
+                                <input type="radio" id={`location-${item.id}`} name="location" value={item.id} checked={this.state.selectedLocationId==item.id} onChange={this.toggleSelectedLocation}/>
                                 <label htmlFor={`location-${item.id}`} className={`global-text-${this.context.theme}`}>{item.name}</label><br/>
                             </div>
                         )
@@ -192,7 +214,7 @@ class FoodMenu extends Component {
                     this.state.times.map((item, index)=>{
                         return(
                             <div className={`time-item`} key={item.id}>
-                                <input type="radio" id={`time-${item.id}`} name="time" value={item.id} checked={this.state.selectedTimeId==item.id} type="checkbox" onChange={this.toggleSelectedTime}/>
+                                <input type="radio" id={`time-${item.id}`} name="time" value={item.id} checked={this.state.selectedTimeId==item.id} onChange={this.toggleSelectedTime}/>
                                 <label htmlFor={`time-${item.id}`} className={`global-text-${this.context.theme}`}>{item.chosenTime}</label><br/>
                             </div>
                         )
@@ -361,12 +383,6 @@ class FoodMenu extends Component {
                     console.log(error);
                     this.props.history.push('/');
                 })
-                /*let alertMessage = `You selected ${selectedMeal.name} with the sidedishes: `;
-                if(this.state.selectedSideDishes&&this.state.selectedSideDishes.length>0)
-                for(let sideDish of selectedSidedishes){
-                    alertMessage += ` ${sideDish.name}`
-                }
-                window.alert(alertMessage);*/
             }
             else {
                 let alertMessage = `You selected no meal so far`;
@@ -405,61 +421,68 @@ class FoodMenu extends Component {
 
     render() { 
         return ( 
-            this.state.loadingAll ? 
-            <div className="custom-spinner-wrapper">
-                <ClipLoader color="blue" loading={this.state.loadingAll} size={300} />
-            </div>
-
-            :
-
-            this.noMeals()?
-
-            <div className={`global-background-${this.context.theme} global-text-${this.context.theme} no-meals`}>
-                <h1>
-                    Meni nije dostupan.
-                </h1>
-            </div>
-
-            :
-
-            <div className={`menu-wrapper global-background-${this.context.theme}`}>
-                <div className = "menu-navigation-wrapper">
-                    <i className={`fa fa-chevron-left food-card-text-${this.context.theme} navigation-chevron`} onClick={this.decrementDate}></i>
-                    <div className={`date-wrapper`}>
-                        <div className={`food-card-text-${this.context.theme} date-day-text`}>
-                            {getLocalDay(moment(this.state.currentDate).format('dddd'))}
-                        </div>
-                        <input value={this.state.currentDate} onChange={this.datePickerChangeDate} type="date" className={`global-text-${this.context.theme} global-background-${this.context.theme} date-picker date-picker-${this.context.theme}`}></input>
-                    </div>
-                    
-                    <i className={`fa fa-chevron-right food-card-text-${this.context.theme} navigation-chevron`} onClick={this.incrementDate}></i>
+            <div>
+                <div className={`title global-text-${this.context.theme}`}>
+                    Naručivanje hrane
                 </div>
                 {
-                    this.state.loadingSpecials ? 
-                    <div className="custom-spinner-wrapper">
-                        <ClipLoader color="blue" loading={this.state.loadingSpecials} size={300} />
-                    </div> 
-                        : 
-                    <div className={`menu-special global-background-${this.context.theme}`}>
-                        {this.mapMeals(this.state.specialMeals, true)}
-                    </div>
+                    this.state.loadingAll ? 
+                        <div className="custom-spinner-wrapper">
+                            <ClipLoader color={mapLoaderTheme(this.context.theme)} loading={this.state.loadingAll} size={300} />
+                        </div>
+            
+                        :
+            
+                        this.noMeals()?
+            
+                        <div className={`global-background-${this.context.theme} global-text-${this.context.theme} no-meals`}>
+                            <h1>
+                                Meni nije dostupan.
+                            </h1>
+                        </div>
+            
+                        :
+            
+                        <div className={`menu-wrapper global-background-${this.context.theme}`}>
+                            <div className = "menu-navigation-wrapper">
+                                <i className={`fa fa-chevron-left food-card-text-${this.context.theme} navigation-chevron`} onClick={this.decrementDate}></i>
+                                <div className={`date-wrapper`}>
+                                    <div className={`food-card-text-${this.context.theme} date-day-text`}>
+                                        {getLocalDay(moment(this.state.currentDate).format('dddd'))}
+                                    </div>
+                                    <input value={this.state.currentDate} onChange={this.datePickerChangeDate} type="date" className={`global-text-${this.context.theme} global-background-${this.context.theme} date-picker date-picker-${this.context.theme}`}></input>
+                                </div>
+                                
+                                <i className={`fa fa-chevron-right food-card-text-${this.context.theme} navigation-chevron`} onClick={this.incrementDate}></i>
+                            </div>
+                            {
+                                this.state.loadingSpecials ? 
+                                <div className="custom-spinner-wrapper">
+                                    <ClipLoader color={mapLoaderTheme(this.context.theme)} loading={this.state.loadingSpecials} size={300} />
+                                </div> 
+                                    : 
+                                <div className={`menu-special global-background-${this.context.theme}`}>
+                                    {this.mapMeals(this.state.specialMeals, true)}
+                                </div>
+                            }
+                            
+                            <hr/>
+                            <div className={`menu-default global-background-${this.context.theme}`}>
+                                {this.mapMeals(this.state.defaultMeals, false)}
+                            </div>
+                            <div className={`location-time-wrapper global-background-${this.context.theme}`}>
+                                {this.mapLocations()}
+                                {this.mapTimes()}
+                            </div>
+                            <div className="menu-buttons-wrapper">
+                                <button className={`btn menu-button menu-button-${this.context.theme}-green`} onClick={this.selectMeal}>Odaberi</button>
+                                <button className={`btn menu-button menu-button-${this.context.theme}-red`} onClick={this.cancelOrder}>Otkaži narudz+žbu</button>
+                            </div>
+                            
+                        </div> 
                 }
-                
-                <hr/>
-                <div className={`menu-default global-background-${this.context.theme}`}>
-                    {this.mapMeals(this.state.defaultMeals, false)}
-                </div>
-                <div className={`location-time-wrapper global-background-${this.context.theme}`}>
-                    {this.mapLocations()}
-                    {this.mapTimes()}
-                </div>
-                <div className="menu-buttons-wrapper">
-                    <button className={`btn menu-button menu-button-${this.context.theme}-green`} onClick={this.selectMeal}>Odaberi</button>
-                    <button className={`btn menu-button menu-button-${this.context.theme}-red`} onClick={this.cancelOrder}>Otkazi narudzbu</button>
-                </div>
-                
-            </div> 
-         );
+            </div>
+        );
     }
 }
 

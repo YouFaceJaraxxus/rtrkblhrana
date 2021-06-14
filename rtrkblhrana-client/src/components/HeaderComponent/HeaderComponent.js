@@ -43,7 +43,7 @@ class HeaderComponent extends Component {
                                 <Nav.Link>Moje narudžbe</Nav.Link>
                             </LinkContainer>
                             <LinkContainer to="/settings">
-                                <Nav.Link>Podešavanje naloga</Nav.Link>
+                                <Nav.Link>Podešavanja</Nav.Link>
                             </LinkContainer>
                             <NavDropdown variant={this.context.theme} title='Jezik' id="basic-nav-dropdown">
                                 <NavDropdown.Item onClick={()=>this.handleLanguageChange('latin')}>Latinica</NavDropdown.Item>

@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const SECRET_KEY = process.env.SECRET || 'XG7lFlmY1AH58VLH24djkUJBzXtmzXlP';
 const userDao = require('./dao/userDao')
 
+
+
 exports.generateToken = (user) => {
     let baseString = user.email+';'+user.password+';'+user.id;
     console.log('baseString', baseString);
@@ -15,17 +17,19 @@ exports.unauthorizedGuard = (req, res, next) => {
         let cookies = req.cookies;
         if(cookies&&cookies.auth){
             let token = cookies.auth;
-            userDao.getUserByToken(token, (result)=>{
-                if(!result||result.length==0){
+            userDao.getUserByToken(token, (user)=>{
+                if(user==null){
                     res.status(401).json({ message: "Unauthorized" });
                 }
                 else{
                     console.log('verify by token good');
-                    let currentUser = result[0];
-                    req.body.currentUser = currentUser;
+                    req.body.currentUser = user;
                     next();
                 }
             });
-        }else res.status(401).json({ message: "Unauthorized" });
+        }else {
+            res.status(401).json({ message: "Unauthorized" });
+            res.end();
+        }
     }else next();
 }

@@ -34,3 +34,12 @@ code {
 .global-background-light{
   background-color: #fefefe !important;
 }
+
+.title{
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  font-size: 2em;
+  font-weight: 500;
+  margin: 1% 0 3% 0;
+}
